@@ -1,40 +1,63 @@
-# QuickerWrite isolated runner
+# QuickerWrite Guizang 隔离 Runner
 
-This AGPL-3.0 runner exposes the repository's presentation runtime through
-QuickerWrite's neutral `v1` JSON job protocol. In QuickerWrite it is bundled
-under `api/ppt_engines` and automatically supervised by the API startup
-chain; operators do not start it or configure a Runner URL separately.
-It remains a separate Node process and source tree, and QuickerWrite never
-imports its implementation into the Django commercial core.
+## Template selection and presentation chrome
 
-## Changes in this fork
+`theme` accepts `swiss`, `classic`, `indigo`, `forest`, `kraft`, and `dune`.
+Explicit choices take precedence over title-based automatic selection. Classic
+palettes are loaded from this repository's `references/themes.md`. Optional
+`theme_color` and `font_name` customize accent and typography. Choices are fixed
+for a generation session; explicit slide backgrounds/content remain authoritative.
+Generated slides do not include runner branding or automatic page-number stamps.
+Source offers and license notices remain available outside presentation content.
 
-- Added asynchronous `POST /v1/jobs` and `GET /v1/jobs/{id}` endpoints plus
-  authenticated artifact download.
-- Added optional HMAC-SHA256 request authentication with a five-minute replay
-  window.
-- Reduced the deployment image to the two HTML templates, local Motion
-  runtime, preview sheet, license/source files, and this Runner. Agent install
-  helpers, development validators, examples, and screenshot-only assets are
-  not shipped.
-- Inlined Motion into each generated HTML artifact, so the artifact remains
-  usable without a sibling asset directory or a GitHub-hosted runtime.
-- Restricted preview serving to the three IDs advertised by QuickerWrite.
+## Incremental page protocol (runner v3)
 
-## Supported contract
+POST /v1/jobs accepts protocol_version=1.0, incremental=true, a stable task_id,
+planned_slides and the current ordered slides. The first request fixes the session
+theme. Each page has a content revision; unchanged pages reuse engine-owned cached
+render output. Requests for the same task are serialized. Cache files survive runner
+restart. A changed page invalidates only that page; finalization reuses the last
+published file when no content changed.
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `GET` | `/health` | Container health probe |
-| `POST` | `/v1/jobs` | Submit a neutral v1 deck job |
-| `GET` | `/v1/jobs/{id}` | Poll job state |
-| `GET` | `/v1/jobs/{id}/artifacts/presentation` | Download the HTML deck |
-| `GET` | `/v1/previews/{showcase,editorial,swiss}` | Read repository-local previews |
-| `GET` | `/source` and `/source/archive` | AGPL corresponding-source offer |
+GET /v1/jobs/{id} exposes ordered pages entries with type=page_ready, page,
+revision, reused, sequence and download_url. GET /v1/jobs/{id}/pages/{page} serves
+an immutable cumulative snapshot ending at that page. Cached Dashi pages have no
+new snapshot URL; their output is included in the job's assembled PPTX. Page events
+are emitted only after native page rendering/persistence succeeds.
 
-The following standalone container is only a development/debugging option for
-this AGPL repository. It is not a separate service in QuickerWrite's Compose
-deployment:
+The health response advertises capabilities.incremental_pages and page_cache.
+The implementation remains in this AGPL fork. No Django models, user records,
+storage credentials or QuickerWrite source modules are imported. The public JSON
+protocol and returned artifacts are the only integration boundary. Modified source
+is included in the existing /source/archive offer.
+
+Runner 始终保留在 Guizang 的 AGPL-3.0 仓库中，对外提供 QuickerWrite 中立 JSON
+v1 协议。QuickerWrite 将本仓库克隆到 `api/ppt_engines`，由 Django API 启动链
+自动托管；部署者无需单独启动，也不填写 Runner URL。商业核心只通过固定内部
+HTTP 端点调用，不导入 Guizang 模板、提示词或运行时代码。
+
+## 本 fork 的修改
+
+- 增加异步中立 v1 作业提交、轮询和带鉴权的产物下载。
+- 增加可选 HMAC-SHA256 请求认证和五分钟防重放窗口。
+- 生产镜像只保留两套 HTML 模板、本地 Motion 运行时、预览、许可、源码文件和
+  Runner；Agent 安装器、开发验证器、示例及截图专用资源不进入镜像。
+- 将 Motion 内联进每份 HTML 产物，离线文件不依赖旁路资源或 GitHub CDN。
+- 预览只开放 QuickerWrite 实际声明的三个 ID。
+
+## 接口
+
+| 方法 | 路径 | 用途 |
+|---|---|---|
+| `GET` | `/health` | 健康检查 |
+| `POST` | `/v1/jobs` | 提交中立 v1 演示文稿任务 |
+| `GET` | `/v1/jobs/{id}` | 查询任务状态 |
+| `GET` | `/v1/jobs/{id}/artifacts/presentation` | 下载 HTML 演示文稿 |
+| `GET` | `/v1/previews/{showcase,editorial,swiss}` | 读取仓库本地预览 |
+| `GET` | `/source`、`/source/archive` | 提供 AGPL 对应源码 |
+
+以下独立容器只用于此 AGPL 仓库的开发调试，不是 QuickerWrite Compose 中的独立
+服务：
 
 ```bash
 docker build -f quickerwrite-runner/Dockerfile -t guizang-ppt-runner:local .
@@ -43,12 +66,7 @@ docker run --rm -p 127.0.0.1:5801:8080 \
   guizang-ppt-runner:local
 ```
 
-Local previews are served from repository assets at `/v1/previews/showcase`,
-`/v1/previews/editorial`, and `/v1/previews/swiss`; no GitHub image URL is
-required at runtime. Corresponding source is offered locally at `/source` and
-downloaded from `/source/archive`; this deployment path does not point users
-to a GitHub-hosted image or source archive.
-
-Only `html` output is supported. QuickerWrite sends titles, slide roles,
-points, and speaker notes through a runner-neutral DTO; repository-specific
-templates and prompts never cross into the QuickerWrite process.
+本地预览来自仓库资源，不依赖 GitHub 图片；对应源码通过 `/source` 和
+`/source/archive` 在本机提供。当前 Runner 只输出 HTML。QuickerWrite 通过中立
+DTO 发送标题、页面角色、要点和演讲备注，Guizang 专属模板与提示词不会进入
+QuickerWrite 进程。

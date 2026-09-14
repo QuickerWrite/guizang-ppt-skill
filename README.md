@@ -378,7 +378,7 @@ guizang-ppt-skill/
 - Massimo Vignelli / Helvetica Forever / 瑞士国际主义网格系统
 - 歸藏线下分享 PPT 系列
 
-## Roadmap
+## 路线图
 
 - 补充更多真实案例和可打开的 HTML deck 示例
 - 扩展封面规格,覆盖更多内容平台
@@ -387,7 +387,7 @@ guizang-ppt-skill/
 - 整理 WorkBuddy 等平台上架版本
 - 增加更多主题包,但继续限制自定义颜色
 
-## FAQ
+## 常见问题
 
 **可以导出 PPTX 吗?**
 当前核心交付是 HTML。你可以用浏览器演示、截图或录屏。如果需要 PPTX,建议把 HTML 页面作为视觉稿再转换,但这不是当前主流程。
@@ -422,6 +422,6 @@ Bug、排版问题、新布局需求——欢迎开 Issue 或 PR。改动请优�
 - 把踩过的坑写到 `checklist.md` 对应的 P0 / P1 / P2 / P3 级别
 - 新主题色进 `themes.md` 并给出适合的场景
 
-## License
+## 开源协议
 
 AGPL-3.0 © 2026 [op7418](https://github.com/op7418)

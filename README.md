@@ -1,5 +1,10 @@
 # Guizang PPT Skill · 网页 PPT / 配图 / 封面
 
+> [!IMPORTANT]
+> 本 fork 的 `quickerwrite-runner-v1` 分支是面向 QuickerWrite 的 AGPL 隔离运行版。它新增中立 JSON v1 作业协议、HMAC 签名、异步任务、HTML 产物下载、本地效果图和对应源码下载；QuickerWrite 主程序只通过 HTTP 调用，不导入本仓库代码。
+>
+> 部署镜像已删除 QuickerWrite 不使用的 Skill 安装文档、开发校验器、截图背景、GitHub 工作流和示例资源，只保留 Style A / Style B 模板、Motion 本地运行时、效果总览与 Runner。生成的 HTML 会内联 Motion，不依赖本仓库相邻文件，也不使用 GitHub 图片链接。部署与接口说明见 [`quickerwrite-runner/README.md`](./quickerwrite-runner/README.md)。原项目的一般 Agent Skill 用法仍保留在下文，版权与 AGPL-3.0 许可不变。
+
 ![GitHub stars](https://img.shields.io/github/stars/op7418/guizang-ppt-skill?style=flat-square)
 ![License](https://img.shields.io/github/license/op7418/guizang-ppt-skill?style=flat-square)
 ![Skill](https://img.shields.io/badge/Skill-Agent-111111?style=flat-square)
@@ -373,7 +378,7 @@ guizang-ppt-skill/
 - Massimo Vignelli / Helvetica Forever / 瑞士国际主义网格系统
 - 歸藏线下分享 PPT 系列
 
-## Roadmap
+## 路线图
 
 - 补充更多真实案例和可打开的 HTML deck 示例
 - 扩展封面规格,覆盖更多内容平台
@@ -382,7 +387,7 @@ guizang-ppt-skill/
 - 整理 WorkBuddy 等平台上架版本
 - 增加更多主题包,但继续限制自定义颜色
 
-## FAQ
+## 常见问题
 
 **可以导出 PPTX 吗?**
 当前核心交付是 HTML。你可以用浏览器演示、截图或录屏。如果需要 PPTX,建议把 HTML 页面作为视觉稿再转换,但这不是当前主流程。
@@ -417,6 +422,6 @@ Bug、排版问题、新布局需求——欢迎开 Issue 或 PR。改动请优�
 - 把踩过的坑写到 `checklist.md` 对应的 P0 / P1 / P2 / P3 级别
 - 新主题色进 `themes.md` 并给出适合的场景
 
-## License
+## 开源协议
 
 AGPL-3.0 © 2026 [op7418](https://github.com/op7418)

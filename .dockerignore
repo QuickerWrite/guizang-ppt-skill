@@ -1,0 +1,11 @@
+.git
+.github
+docs
+references
+scripts
+assets/screenshot-backgrounds
+.runner-output
+README.en.md
+CONTRIBUTING.md
+SKILL.md
+SPONSORS.md

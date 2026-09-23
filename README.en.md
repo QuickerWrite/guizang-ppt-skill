@@ -1,5 +1,10 @@
 # Guizang PPT Skill · Web Decks / Images / Covers
 
+> [!IMPORTANT]
+> The `quickerwrite-runner-v1` branch of this fork is an AGPL-isolated runtime for QuickerWrite. It adds a neutral JSON v1 job protocol, HMAC signing, asynchronous jobs, HTML artifact downloads, local previews, and a corresponding-source download. QuickerWrite communicates with it only over HTTP and does not import this repository.
+>
+> The deployment image omits Skill installation docs, development validators, screenshot backgrounds, GitHub workflows, and examples that QuickerWrite never executes. It keeps only the Style A / Style B templates, the local Motion runtime, the preview sheet, and the Runner. Generated HTML inlines Motion and has no runtime dependency on GitHub-hosted images. See [`quickerwrite-runner/README.md`](./quickerwrite-runner/README.md) for deployment and API details. The upstream Agent Skill documentation remains below; copyright and AGPL-3.0 licensing are unchanged.
+
 ![GitHub stars](https://img.shields.io/github/stars/op7418/guizang-ppt-skill?style=flat-square)
 ![License](https://img.shields.io/github/license/op7418/guizang-ppt-skill?style=flat-square)
 ![Skill](https://img.shields.io/badge/Skill-Agent-111111?style=flat-square)

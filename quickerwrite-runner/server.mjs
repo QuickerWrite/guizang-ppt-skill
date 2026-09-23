@@ -348,7 +348,7 @@ const server = http.createServer(async (req, res) => {
     let spec; try { spec = JSON.parse(body.toString('utf8')); } catch { return json(res, 400, { error: 'invalid JSON' }); }
     if (spec.protocol_version !== '1.0') return json(res, 400, { error: 'unsupported protocol_version' });
     const jobId = crypto.randomUUID();
-    jobs.set(jobId, { job_id: jobId, status: 'queued', progress: 0, stage: 'queued', artifacts: [], engine_version: 'quickerwrite-runner-v3', source_offer_url: '/source' });
+    jobs.set(jobId, { job_id: jobId, status: 'queued', progress: 0, stage: 'queued', artifacts: [], engine_version: 'upstream-c91369c-quickerwrite.1', source_offer_url: '/source' });
     const queueKey = String(spec.task_id || jobId);
     const operation = (sessionQueues.get(queueKey) || Promise.resolve()).then(() => generate(jobId,spec));
     sessionQueues.set(queueKey,operation);

@@ -21,20 +21,21 @@ published file when no content changed.
 
 GET /v1/jobs/{id} exposes ordered pages entries with type=page_ready, page,
 revision, reused, sequence and download_url. GET /v1/jobs/{id}/pages/{page} serves
-an immutable cumulative snapshot ending at that page. Cached Dashi pages have no
-new snapshot URL; their output is included in the job's assembled PPTX. Page events
-are emitted only after native page rendering/persistence succeeds.
+an immutable cumulative snapshot ending at that page. Cached pages are materialized
+into the current job as cumulative HTML snapshots, so every page event has a usable
+preview URL. Events are emitted only after the engine-owned fragment and snapshot
+are persisted.
 
 The health response advertises capabilities.incremental_pages and page_cache.
-The implementation remains in this AGPL fork. No Django models, user records,
+The implementation remains in this AGPL fork. No Go API or Python Worker models, user records,
 storage credentials or QuickerWrite source modules are imported. The public JSON
 protocol and returned artifacts are the only integration boundary. Modified source
 is included in the existing /source/archive offer.
 
 Runner 始终保留在 Guizang 的 AGPL-3.0 仓库中，对外提供 QuickerWrite 中立 JSON
-v1 协议。QuickerWrite 将本仓库克隆到 `api/ppt_engines`，由 Django API 启动链
-自动托管；部署者无需单独启动，也不填写 Runner URL。商业核心只通过固定内部
-HTTP 端点调用，不导入 Guizang 模板、提示词或运行时代码。
+v1 协议。QuickerWrite 的发布包固定此仓库版本，由部署编排按所选 PPT 引擎启动；
+Go API 和 Python 文档 Worker 只通过固定内部 HTTP 协议调用，不导入 Guizang
+模板、提示词或运行时代码。
 
 ## 本 fork 的修改
 
@@ -67,6 +68,7 @@ docker run --rm -p 127.0.0.1:5801:8080 \
 ```
 
 本地预览来自仓库资源，不依赖 GitHub 图片；对应源码通过 `/source` 和
-`/source/archive` 在本机提供。当前 Runner 只输出 HTML。QuickerWrite 通过中立
-DTO 发送标题、页面角色、要点和演讲备注，Guizang 专属模板与提示词不会进入
+`/source/archive` 在本机提供。Runner 输出逐页和最终 HTML，QuickerWrite 文档
+Worker 将同一最终 HTML 转为 PPTX，避免先用另一引擎伪造预览。QuickerWrite 通过
+中立 DTO 发送标题、页面角色、要点和演讲备注，Guizang 专属模板与提示词不会进入
 QuickerWrite 进程。

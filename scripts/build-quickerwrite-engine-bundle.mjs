@@ -16,7 +16,7 @@ const targetArch = arch === 'x64' ? 'amd64' : arch;
 const staging = fs.mkdtempSync(path.join(os.tmpdir(), 'qw-guizang-engine-'));
 const payload = path.join(staging, 'engine');
 const excluded = new Set(['.git', '.github', '.runner-output', 'dist']);
-fs.cpSync(root, payload, { recursive: true, filter: source => !source.split(path.sep).some(part => excluded.has(part)) });
+fs.cpSync(root, payload, { recursive: true, dereference: true, filter: source => !source.split(path.sep).some(part => excluded.has(part)) });
 const files = [];
 function walk(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {

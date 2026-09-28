@@ -41,6 +41,8 @@ jobs:
           for attempt in {1..20}; do curl -fsS http://127.0.0.1:18080/v1/capabilities | grep -q 'qw-ppt-engine/v1' && exit 0; sleep 0.25; done
           exit 1
       - run: node scripts/build-quickerwrite-engine-bundle.mjs "${{ steps.version.outputs.version }}" "${{ matrix.arch }}"
+      - name: Verify closed bundle manifest
+        run: python3 scripts/verify-quickerwrite-engine-bundle.py dist/*.zip
       - uses: actions/upload-artifact@v5
         with:
           name: guizang-${{ matrix.arch }}

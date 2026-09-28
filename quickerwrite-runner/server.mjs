@@ -325,7 +325,8 @@ async function generate(jobId, spec) {
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url || '/', 'http://runner.local');
-  if (req.method === 'GET' && url.pathname === '/health') return json(res, 200, { ok: true, engine: 'guizang', capabilities:{incremental_pages:true,page_cache:true} });
+  if (req.method === 'GET' && url.pathname === '/health') return json(res, 200, { ok: true, engine: 'guizang', api_version: 'qw-ppt-engine/v1', capabilities:{incremental_pages:true,page_cache:true} });
+  if (req.method === 'GET' && url.pathname === '/v1/capabilities') return json(res, 200, { engine: 'guizang', api_version: 'qw-ppt-engine/v1', incremental_pages: true, page_cache: true, outputs: ['html'] });
   if (req.method === 'GET' && url.pathname === '/source') return json(res, 200, { license: 'AGPL-3.0', download_url: '/source/archive' });
   if (req.method === 'GET' && url.pathname === '/source/archive') {
     try { const data = fs.readFileSync(sourceArchive()); res.writeHead(200, { 'content-type': 'application/gzip', 'content-disposition': 'attachment; filename="guizang-ppt-skill-source.tar.gz"', 'content-length': data.length }); return res.end(data); }

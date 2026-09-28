@@ -1,0 +1,66 @@
+name: QuickerWrite Engine Release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Semantic version to publish
+        required: true
+        type: string
+permissions:
+  contents: write
+jobs:
+  bundle:
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          version="${{ inputs.version || github.ref_name }}"; version="${version#v}"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]] || { echo "invalid version: $version" >&2; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - run: node --check quickerwrite-runner/server.mjs
+      - name: Verify runtime contract
+        shell: bash
+        run: |
+          QW_RUNNER_HOST=127.0.0.1 QW_RUNNER_PORT=18080 node quickerwrite-runner/server.mjs & pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for attempt in {1..20}; do curl -fsS http://127.0.0.1:18080/v1/capabilities | grep -q 'qw-ppt-engine/v1' && exit 0; sleep 0.25; done
+          exit 1
+      - run: node scripts/build-quickerwrite-engine-bundle.mjs "${{ steps.version.outputs.version }}" "${{ matrix.arch }}"
+      - uses: actions/upload-artifact@v5
+        with:
+          name: guizang-${{ matrix.arch }}
+          path: dist/*
+          if-no-files-found: error
+  release:
+    needs: bundle
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v6
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Resolve tag
+        id: tag
+        shell: bash
+        run: |
+          version="${{ inputs.version || github.ref_name }}"; echo "tag=v${version#v}" >> "$GITHUB_OUTPUT"
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          generate_release_notes: true
+          files: dist/*

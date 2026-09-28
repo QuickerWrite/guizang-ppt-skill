@@ -25,6 +25,8 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
+      - name: Install 7z packaging tool
+        run: sudo apt-get update && sudo apt-get install -y 7zip
       - name: Resolve version
         id: version
         shell: bash
@@ -42,7 +44,7 @@ jobs:
           exit 1
       - run: node scripts/build-quickerwrite-engine-bundle.mjs "${{ steps.version.outputs.version }}" "${{ matrix.arch }}"
       - name: Verify closed bundle manifest
-        run: python3 scripts/verify-quickerwrite-engine-bundle.py dist/*.zip
+        run: python3 scripts/verify-quickerwrite-engine-bundle.py dist/*.7z
       - uses: actions/upload-artifact@v7
         with:
           name: guizang-${{ matrix.arch }}

@@ -36,14 +36,8 @@ const manifest = {
 };
 fs.writeFileSync(path.join(staging, 'engine-manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
 fs.mkdirSync(output, { recursive: true });
-const name = `quickerwrite-ppt-engine-guizang-${version}-linux-${targetArch}.zip`;
-execFileSync('python3', ['-c', `import os,sys,zipfile
-root,out=sys.argv[1:]
-with zipfile.ZipFile(out,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
-  for base,dirs,files in os.walk(root):
-    dirs.sort(); files.sort()
-    for name in files:
-      full=os.path.join(base,name); z.write(full,os.path.relpath(full,root).replace(os.sep,'/'))`, staging, path.join(output, name)]);
+const name = `quickerwrite-ppt-engine-guizang-${version}-linux-${targetArch}.7z`;
+execFileSync('7z', ['a', '-t7z', '-mx=9', path.join(output, name), './*'], { cwd: staging, stdio: 'inherit' });
 const archive = fs.readFileSync(path.join(output, name));
 fs.writeFileSync(path.join(output, `${name}.sha256`), `${crypto.createHash('sha256').update(archive).digest('hex')}  ${name}\n`);
 fs.rmSync(staging, { recursive: true, force: true });

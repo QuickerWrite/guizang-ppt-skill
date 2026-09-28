@@ -21,8 +21,8 @@ jobs:
             arch: arm64
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
       - name: Resolve version
@@ -43,7 +43,7 @@ jobs:
       - run: node scripts/build-quickerwrite-engine-bundle.mjs "${{ steps.version.outputs.version }}" "${{ matrix.arch }}"
       - name: Verify closed bundle manifest
         run: python3 scripts/verify-quickerwrite-engine-bundle.py dist/*.zip
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         with:
           name: guizang-${{ matrix.arch }}
           path: dist/*
@@ -52,7 +52,7 @@ jobs:
     needs: bundle
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true
@@ -61,7 +61,7 @@ jobs:
         shell: bash
         run: |
           version="${{ inputs.version || github.ref_name }}"; echo "tag=v${version#v}" >> "$GITHUB_OUTPUT"
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           generate_release_notes: true

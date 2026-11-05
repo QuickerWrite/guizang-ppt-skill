@@ -1,4 +1,4 @@
-FROM node:22-bookworm-slim
+FROM node:26.10.0-bookworm-slim
 WORKDIR /opt/guizang-ppt-skill
 COPY LICENSE README.md ./
 COPY assets/template.html assets/template-swiss.html assets/motion.min.js assets/ppt-skill-showcase.png ./assets/
